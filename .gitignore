@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+.env
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Large datasets & model weights
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+models/*
+!models/.gitkeep
+*.pt
+*.bin
+*.safetensors
+*.pth
+checkpoint-*/
+
+# IDEs & System files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
