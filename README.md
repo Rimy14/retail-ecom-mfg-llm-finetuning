@@ -11,7 +11,7 @@ This project contains the pipeline and files for preparing domain-specific datas
 
 *   **Industry Focus**: Retail, E-commerce, and Manufacturing
 *   **Target Architectures**: Qwen & Llama
-*   **Current Phase**: Data Cleaning and LoRA Configuration
+*   **Current Phase**: Training Pipeline Development
 
 ---
 
@@ -31,12 +31,14 @@ Retail/
 │       └── test.json                  # 10% test split
 ├── notebooks/
 │   ├── setup_and_data_collection.ipynb       # Day 1 notebook
-│   └── data_cleaning_and_qlora_config.ipynb  # Day 2 notebook
+│   ├── data_cleaning_and_qlora_config.ipynb  # Day 2 notebook
+│   └── training_pipeline.ipynb               # Day 3 notebook
 ├── src/
 │   ├── __init__.py
 │   ├── data_collection.py             # HF dataset downloader
 │   ├── data_cleaning.py               # Data cleaning & split generator
-│   └── verify_models.py               # 4-bit model loading verification
+│   ├── verify_models.py               # 4-bit model loading verification
+│   └── train.py                       # Unified QLoRA SFT training script
 ├── models/
 ├── .gitignore
 └── README.md
@@ -75,7 +77,7 @@ The training and preparation pipeline runs on **Google Colab** with GPU runtime 
 
 ## Future Work
 1. **Day 2 (Completed)**: Run data cleaning pipelines, split data, and write LoRA configurations (Rank 16, Alpha 32).
-2. **Day 3**: Write training pipelines, quantized model loading checks, and connect to Weights & Biases (W&B).
+2. **Day 3 (Completed)**: Write training pipelines, quantized model loading checks, and connect to Weights & Biases (W&B).
 3. **Day 4**: Execute simultaneous fine-tuning of Qwen and Llama models (v1 checkpoints).
 4. **Day 5-8**: Evaluate v1 models, generate synthetic QA expansion files, fine-tune v2/v3 models.
 5. **Day 9-10**: Set up ChromaDB, index domain manuals, and train v4 models (RAG-Aware).
