@@ -200,10 +200,10 @@ def main():
             save_total_limit=1,
             fp16=True,
             report_to="wandb" if os.environ.get("WANDB_DISABLED", "").lower() != "true" else "none",
-            warmup_ratio=0.03,
             lr_scheduler_type="cosine",
             remove_unused_columns=False
         )
+        training_args.warmup_ratio = 0.03
 
     # 8. Initialize SFTTrainer
     print("[*] Initializing SFTTrainer...")
