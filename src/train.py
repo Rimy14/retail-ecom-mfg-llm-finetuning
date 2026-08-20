@@ -46,6 +46,18 @@ def parse_args():
         action="store_true",
         help="If set, runs a quick training check on a tiny dataset slice (50 items) for 5 steps."
     )
+    parser.add_argument(
+        "--max_train_samples",
+        type=int,
+        default=None,
+        help="If set, limits the training dataset to this number of samples."
+    )
+    parser.add_argument(
+        "--max_val_samples",
+        type=int,
+        default=None,
+        help="If set, limits the validation dataset to this number of samples."
+    )
     return parser.parse_args()
 
 def format_example(example):
@@ -150,8 +162,19 @@ def main():
         }
     )
     
-    train_dataset = dataset["train"].map(format_example)
-    val_dataset = dataset["validation"].map(format_example)
+    train_dataset = dataset["train"]
+    val_dataset = dataset["validation"]
+    
+    if args.max_train_samples is not None:
+        train_dataset = train_dataset.select(range(min(len(train_dataset), args.max_train_samples)))
+        print(f"[+] Sliced train dataset to {len(train_dataset)} samples.")
+        
+    if args.max_val_samples is not None:
+        val_dataset = val_dataset.select(range(min(len(val_dataset), args.max_val_samples)))
+        print(f"[+] Sliced val dataset to {len(val_dataset)} samples.")
+        
+    train_dataset = train_dataset.map(format_example)
+    val_dataset = val_dataset.map(format_example)
     print(f"[+] Formatted datasets with 'text' column.")
     
     # 7. Configure Training Arguments
