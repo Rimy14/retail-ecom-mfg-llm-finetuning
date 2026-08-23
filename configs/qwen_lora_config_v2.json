@@ -1,0 +1,21 @@
+{
+  "model_type": "qwen",
+  "model_id": "Qwen/Qwen2.5-7B-Instruct",
+  "output_dir": "models/qwen_v2",
+  "peft_settings": {
+    "r": 16,
+    "lora_alpha": 32,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ],
+    "lora_dropout": 0.05,
+    "bias": "none"
+  },
+  "bnb_4bit_compute_dtype": "float16"
+}
