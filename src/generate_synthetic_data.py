@@ -199,6 +199,11 @@ def generate_manufacturing_qa():
 def main():
     print("[*] Generating synthetic domain-specific QA expansion pairs...")
     
+    # Determine project root dynamically relative to the script location
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
+    print(f"[*] Detected project root directory: {project_root}")
+    
     retail_synthetic = generate_retail_qa()
     mfg_synthetic = generate_manufacturing_qa()
     
@@ -208,15 +213,15 @@ def main():
     print(f"[+] Total Synthetic QA pairs: {len(all_synthetic)}")
     
     # Save synthetic records
-    synthetic_file = "data/processed/synthetic_qa.json"
+    synthetic_file = os.path.join(project_root, "data/processed/synthetic_qa.json")
     os.makedirs(os.path.dirname(synthetic_file), exist_ok=True)
     with open(synthetic_file, "w", encoding="utf-8") as f:
         json.dump(all_synthetic, f, ensure_ascii=False, indent=2)
     print(f"[+] Synthetic data saved to {synthetic_file}")
     
     # Merge with original train.json
-    train_file = "data/processed/train.json"
-    train_v2_file = "data/processed/train_v2.json"
+    train_file = os.path.join(project_root, "data/processed/train.json")
+    train_v2_file = os.path.join(project_root, "data/processed/train_v2.json")
     
     if os.path.exists(train_file):
         print(f"[*] Loading original train dataset from {train_file}...")
@@ -270,9 +275,12 @@ def main():
         "bnb_4bit_compute_dtype": "float16"
     }
     
-    with open("configs/qwen_lora_config_v2.json", "w", encoding="utf-8") as f:
+    qwen_cfg_path = os.path.join(project_root, "configs/qwen_lora_config_v2.json")
+    llama_cfg_path = os.path.join(project_root, "configs/llama_lora_config_v2.json")
+    
+    with open(qwen_cfg_path, "w", encoding="utf-8") as f:
         json.dump(qwen_v2_cfg, f, indent=2)
-    with open("configs/llama_lora_config_v2.json", "w", encoding="utf-8") as f:
+    with open(llama_cfg_path, "w", encoding="utf-8") as f:
         json.dump(llama_v2_cfg, f, indent=2)
         
     print("[+] v2 configuration files written successfully.")
