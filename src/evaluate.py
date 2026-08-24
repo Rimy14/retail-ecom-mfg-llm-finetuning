@@ -15,6 +15,10 @@ try:
     nltk.data.find('tokenizers/punkt')
 except LookupError:
     nltk.download('punkt', quiet=True)
+try:
+    nltk.data.find('tokenizers/punkt_tab')
+except LookupError:
+    nltk.download('punkt_tab', quiet=True)
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Evaluate fine-tuned model against reference dataset.")
