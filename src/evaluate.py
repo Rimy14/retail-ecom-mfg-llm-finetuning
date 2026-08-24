@@ -85,14 +85,17 @@ def main():
         args.model_id,
         quantization_config=bnb_config,
         device_map="auto",
-        trust_remote_code=True
+        trust_remote_code=True,
+        torch_dtype=torch.float16
     )
     
-    # Apply QLoRA dtypes casting sweep to avoid T4 gradient/precision issues
-    # Ensure all float16 model buffers are clean
-    for name, module in base_model.named_modules():
-        if "norm" in name or "ln" in name:
-            module.to(torch.float32)
+    # Force all bfloat16 parameters and buffers in the base model to float16 to prevent bfloat16 propagation
+    for name, param in base_model.named_parameters():
+        if param.dtype == torch.bfloat16:
+            param.data = param.data.to(torch.float16)
+    for name, buf in base_model.named_buffers():
+        if buf.dtype == torch.bfloat16:
+            buf.data = buf.data.to(torch.float16)
             
     # 3. Load LoRA Adapter if provided
     if args.adapter_dir:
