@@ -1,10 +1,12 @@
 {
   "model_type": "llama",
-  "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
-  "output_dir": "models/llama_v2",
-  "peft_settings": {
+  "base_model_name_or_path": "meta-llama/Meta-Llama-3-8B-Instruct",
+  "peft_config": {
     "r": 16,
     "lora_alpha": 32,
+    "lora_dropout": 0.05,
+    "bias": "none",
+    "task_type": "CAUSAL_LM",
     "target_modules": [
       "q_proj",
       "k_proj",
@@ -13,9 +15,12 @@
       "gate_proj",
       "up_proj",
       "down_proj"
-    ],
-    "lora_dropout": 0.05,
-    "bias": "none"
+    ]
   },
-  "bnb_4bit_compute_dtype": "float16"
+  "quantization_config": {
+    "load_in_4bit": true,
+    "bnb_4bit_quant_type": "nf4",
+    "bnb_4bit_use_double_quant": true,
+    "bnb_4bit_compute_dtype": "float16"
+  }
 }

@@ -249,30 +249,40 @@ def main():
     
     qwen_v2_cfg = {
         "model_type": "qwen",
-        "model_id": "Qwen/Qwen2.5-7B-Instruct",
-        "output_dir": "models/qwen_v2",
-        "peft_settings": {
+        "base_model_name_or_path": "Qwen/Qwen2.5-7B-Instruct",
+        "peft_config": {
             "r": 16,
             "lora_alpha": 32,
-            "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
             "lora_dropout": 0.05,
-            "bias": "none"
+            "bias": "none",
+            "task_type": "CAUSAL_LM",
+            "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
         },
-        "bnb_4bit_compute_dtype": "float16"
+        "quantization_config": {
+            "load_in_4bit": True,
+            "bnb_4bit_quant_type": "nf4",
+            "bnb_4bit_use_double_quant": True,
+            "bnb_4bit_compute_dtype": "float16"
+        }
     }
     
     llama_v2_cfg = {
         "model_type": "llama",
-        "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
-        "output_dir": "models/llama_v2",
-        "peft_settings": {
+        "base_model_name_or_path": "meta-llama/Meta-Llama-3-8B-Instruct",
+        "peft_config": {
             "r": 16,
             "lora_alpha": 32,
-            "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
             "lora_dropout": 0.05,
-            "bias": "none"
+            "bias": "none",
+            "task_type": "CAUSAL_LM",
+            "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
         },
-        "bnb_4bit_compute_dtype": "float16"
+        "quantization_config": {
+            "load_in_4bit": True,
+            "bnb_4bit_quant_type": "nf4",
+            "bnb_4bit_use_double_quant": True,
+            "bnb_4bit_compute_dtype": "float16"
+        }
     }
     
     qwen_cfg_path = os.path.join(project_root, "configs/qwen_lora_config_v2.json")
