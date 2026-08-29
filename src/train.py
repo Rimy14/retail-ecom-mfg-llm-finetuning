@@ -250,7 +250,20 @@ def main():
             
     # 9. Launch Training
     print("[*] Starting training...")
-    trainer.train()
+    
+    resume_from_checkpoint = None
+    if args.output_dir and os.path.exists(args.output_dir):
+        checkpoints = [
+            d for d in os.listdir(args.output_dir)
+            if d.startswith("checkpoint-") and os.path.isdir(os.path.join(args.output_dir, d))
+        ]
+        if checkpoints:
+            checkpoints.sort(key=lambda x: int(x.split("-")[-1]))
+            latest_checkpoint = os.path.join(args.output_dir, checkpoints[-1])
+            print(f"[+] Found existing checkpoints. Resuming training from: {latest_checkpoint}")
+            resume_from_checkpoint = latest_checkpoint
+            
+    trainer.train(resume_from_checkpoint=resume_from_checkpoint)
     print("[+] Training completed successfully!")
     
     # Save final adapter weights
