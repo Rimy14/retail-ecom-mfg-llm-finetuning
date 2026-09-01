@@ -139,9 +139,19 @@ def main():
     for idx, sample in enumerate(test_samples):
         instruction = sample["instruction"]
         reference = sample["response"]
+        context = sample.get("context", "").strip()
         
-        # Build prompt using SFT instruction-tuning prompt template
-        prompt = f"Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n### Instruction:\n{instruction}\n\n### Response:\n"
+        # Build prompt using SFT instruction-tuning prompt template (RAG-aware)
+        if context:
+            prompt = (
+                f"Below is an instruction that describes a task, paired with an input that provides further context. "
+                f"Write a response that appropriately completes the request.\n\n"
+                f"### Instruction:\n{instruction}\n\n"
+                f"### Context:\n{context}\n\n"
+                f"### Response:\n"
+            )
+        else:
+            prompt = f"Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n### Instruction:\n{instruction}\n\n### Response:\n"
         
         inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
         

@@ -63,14 +63,26 @@ def parse_args():
 def format_example(example):
     """
     Converts a single dataset row into an instruction-tuning prompt string.
+    Supports RAG-aware formatting if 'context' field is present.
     """
     instruction = example['instruction']
     response = example['response']
-    example['text'] = (
-        f"Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n"
-        f"### Instruction:\n{instruction}\n\n"
-        f"### Response:\n{response}"
-    )
+    context = example.get('context', '').strip()
+    
+    if context:
+        example['text'] = (
+            f"Below is an instruction that describes a task, paired with an input that provides further context. "
+            f"Write a response that appropriately completes the request.\n\n"
+            f"### Instruction:\n{instruction}\n\n"
+            f"### Context:\n{context}\n\n"
+            f"### Response:\n{response}"
+        )
+    else:
+        example['text'] = (
+            f"Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n"
+            f"### Instruction:\n{instruction}\n\n"
+            f"### Response:\n{response}"
+        )
     return example
 
 def main():
