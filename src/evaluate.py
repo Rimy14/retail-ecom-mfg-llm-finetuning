@@ -70,9 +70,11 @@ def main():
     print(f"[*] Output Path: {args.output_file}")
     print("==============================================\n")
     
+    token = os.environ.get("HF_TOKEN") or True
+
     # 1. Load Tokenizer
     print("[*] Loading tokenizer...")
-    tokenizer = AutoTokenizer.from_pretrained(args.model_id, trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(args.model_id, trust_remote_code=True, token=token)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
         
@@ -90,7 +92,8 @@ def main():
         quantization_config=bnb_config,
         device_map="auto",
         trust_remote_code=True,
-        torch_dtype=torch.float16
+        torch_dtype=torch.float16,
+        token=token
     )
     
     # Force all bfloat16 parameters and buffers in the base model to float16 to prevent bfloat16 propagation
