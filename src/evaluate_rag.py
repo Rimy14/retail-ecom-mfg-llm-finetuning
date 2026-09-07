@@ -84,8 +84,17 @@ def main():
         if buf.dtype == torch.bfloat16:
             buf.data = buf.data.to(torch.float16)
             
-    print(f"[*] Attaching Fine-Tuned v3 LoRA Adapter from: {args.adapter_dir}...")
-    model = PeftModel.from_pretrained(base_model, args.adapter_dir)
+    adapter_path = args.adapter_dir
+    if "{gdrive_dir}" in adapter_path or not os.path.exists(adapter_path):
+        for candidate_root in ["/content/drive/MyDrive/Retail LLM", "/content/drive/MyDrive/Retail", "/content/Retail", "."]:
+            clean_sub = adapter_path.replace("{gdrive_dir}/", "").replace("{gdrive_dir}", "")
+            candidate = os.path.join(candidate_root, clean_sub)
+            if os.path.exists(os.path.join(candidate, "adapter_config.json")):
+                adapter_path = candidate
+                break
+                
+    print(f"[*] Attaching Fine-Tuned v3 LoRA Adapter from: {adapter_path}...")
+    model = PeftModel.from_pretrained(base_model, adapter_path)
     model.eval()
     
     # 3. Load Test Data
