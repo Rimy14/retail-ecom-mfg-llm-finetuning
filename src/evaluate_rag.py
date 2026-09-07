@@ -85,12 +85,19 @@ def main():
             buf.data = buf.data.to(torch.float16)
             
     adapter_path = args.adapter_dir
-    if "{gdrive_dir}" in adapter_path or not os.path.exists(adapter_path):
-        for candidate_root in ["/content/drive/MyDrive/Retail LLM", "/content/drive/MyDrive/Retail", "/content/Retail", "."]:
-            clean_sub = adapter_path.replace("{gdrive_dir}/", "").replace("{gdrive_dir}", "")
-            candidate = os.path.join(candidate_root, clean_sub)
-            if os.path.exists(os.path.join(candidate, "adapter_config.json")):
+    if "{" in adapter_path or not os.path.exists(adapter_path) or not os.path.exists(os.path.join(adapter_path, "adapter_config.json")):
+        print(f"[*] Input adapter path '{adapter_path}' requires resolution. Searching candidate directories...")
+        candidates = [
+            "/content/drive/MyDrive/Retail LLM/models/llama_v3",
+            "/content/drive/MyDrive/Retail/models/llama_v3",
+            "/content/Retail/models/llama_v3",
+            "models/llama_v3",
+            os.path.expanduser("~/models/llama_v3")
+        ]
+        for candidate in candidates:
+            if os.path.exists(candidate) and os.path.exists(os.path.join(candidate, "adapter_config.json")):
                 adapter_path = candidate
+                print(f"[+] Successfully found valid adapter at: {adapter_path}")
                 break
                 
     print(f"[*] Attaching Fine-Tuned v3 LoRA Adapter from: {adapter_path}...")
