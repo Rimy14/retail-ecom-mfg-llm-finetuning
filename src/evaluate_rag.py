@@ -46,7 +46,13 @@ def main():
     rag_pipe = RetailMfgRAGPipeline(persist_dir=args.chroma_dir)
     rag_pipe.index_knowledge_directory(args.kb_dir)
     
-    token = os.environ.get("HF_TOKEN") or True
+    token = os.environ.get("HF_TOKEN")
+    if not token:
+        try:
+            from huggingface_hub import get_token
+            token = get_token()
+        except Exception:
+            token = None
     
     # 2. Load Model & Tokenizer
     print("[*] Loading Tokenizer...")
