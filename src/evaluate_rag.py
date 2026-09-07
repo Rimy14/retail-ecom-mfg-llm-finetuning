@@ -171,13 +171,13 @@ def main():
             "bleu": bleu
         })
         
-        if (idx + 1) % 25 == 0 or (idx + 1) == len(eval_samples):
-            print(f"    - Processed {idx + 1}/{len(eval_samples)} queries | Current Avg BLEU: {total_bleu/(idx+1):.4f}")
+        if (idx + 1) % 5 == 0 or (idx + 1) == len(eval_samples):
+            print(f"    [+] Processed {idx + 1}/{len(eval_samples)} queries | Current Avg BLEU: {total_bleu/(idx+1):.4f}", flush=True)
 
     n = len(eval_samples)
     summary = {
         "model_id": args.model_id,
-        "adapter_dir": args.adapter_dir,
+        "adapter_dir": adapter_path,
         "total_evaluated": n,
         "mean_rouge1": total_r1 / n,
         "mean_rouge2": total_r2 / n,
@@ -185,12 +185,12 @@ def main():
         "mean_bleu": total_bleu / n
     }
     
-    print("\n=================== RAG EVALUATION SUMMARY (200 QUERIES) ===================")
-    print(f"[+] Mean ROUGE-1: {summary['mean_rouge1']:.4f}")
-    print(f"[+] Mean ROUGE-2: {summary['mean_rouge2']:.4f}")
-    print(f"[+] Mean ROUGE-L: {summary['mean_rougeL']:.4f}")
-    print(f"[+] Mean BLEU:    {summary['mean_bleu']:.4f}")
-    print("============================================================================\n")
+    print("\n=================== RAG EVALUATION SUMMARY ===================", flush=True)
+    print(f"[+] Mean ROUGE-1: {summary['mean_rouge1']:.4f}", flush=True)
+    print(f"[+] Mean ROUGE-2: {summary['mean_rouge2']:.4f}", flush=True)
+    print(f"[+] Mean ROUGE-L: {summary['mean_rougeL']:.4f}", flush=True)
+    print(f"[+] Mean BLEU:    {summary['mean_bleu']:.4f}", flush=True)
+    print("============================================================\n", flush=True)
     
     os.makedirs(os.path.dirname(args.output_file), exist_ok=True)
     with open(args.output_file, "w", encoding="utf-8") as f:
