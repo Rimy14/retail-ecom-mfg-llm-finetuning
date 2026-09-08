@@ -19,14 +19,14 @@ except Exception:
     pass
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Evaluate End-to-End RAG Pipeline on 200 Queries")
+    parser = argparse.ArgumentParser(description="Evaluate End-to-End RAG Pipeline on Test Queries")
     parser.add_argument("--model_id", type=str, default="meta-llama/Meta-Llama-3-8B-Instruct", help="Base Foundation Model")
-    parser.add_argument("--adapter_dir", type=str, required=True, help="Path to Fine-Tuned v3 LoRA Adapter")
-    parser.add_argument("--test_file", type=str, default="data/processed/test_v3.json", help="Test dataset path")
+    parser.add_argument("--adapter_dir", type=str, required=True, help="Path to Fine-Tuned LoRA Adapter")
+    parser.add_argument("--test_file", type=str, default="data/processed/test_v4.json", help="Test dataset path")
     parser.add_argument("--kb_dir", type=str, default="data/knowledge_base", help="Knowledge base documents directory")
     parser.add_argument("--chroma_dir", type=str, default="data/chroma_db", help="ChromaDB persistence directory")
-    parser.add_argument("--output_file", type=str, default="models/evaluation/rag_pipeline_200_results.json", help="Output results path")
-    parser.add_argument("--num_samples", type=int, default=200, help="Number of test queries to benchmark")
+    parser.add_argument("--output_file", type=str, default="models/evaluation/rag_pipeline_v4_results.json", help="Output results path")
+    parser.add_argument("--num_samples", type=int, default=100, help="Number of test queries to benchmark")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for sampling")
     return parser.parse_args()
 
@@ -35,7 +35,7 @@ def main():
     random.seed(args.seed)
     
     print("\n=======================================================")
-    print("[*] DAY 9: End-to-End RAG Pipeline Benchmark (200 Queries)")
+    print(f"[*] RAG Pipeline Benchmark ({args.num_samples} Queries)")
     print(f"[*] Base Model:      {args.model_id}")
     print(f"[*] Adapter Path:    {args.adapter_dir}")
     print(f"[*] Test Dataset:    {args.test_file}")
@@ -85,14 +85,15 @@ def main():
             buf.data = buf.data.to(torch.float16)
             
     adapter_path = args.adapter_dir
+    adapter_name = os.path.basename(adapter_path.rstrip("/\\"))
     if "{" in adapter_path or not os.path.exists(adapter_path) or not os.path.exists(os.path.join(adapter_path, "adapter_config.json")):
         print(f"[*] Input adapter path '{adapter_path}' requires resolution. Searching candidate directories...")
         candidates = [
-            "/content/drive/MyDrive/Retail LLM/models/llama_v3",
-            "/content/drive/MyDrive/Retail/models/llama_v3",
-            "/content/Retail/models/llama_v3",
-            "models/llama_v3",
-            os.path.expanduser("~/models/llama_v3")
+            f"/content/drive/MyDrive/Retail LLM/models/{adapter_name}",
+            f"/content/drive/MyDrive/Retail/models/{adapter_name}",
+            f"/content/Retail/models/{adapter_name}",
+            f"models/{adapter_name}",
+            os.path.expanduser(f"~/models/{adapter_name}")
         ]
         for candidate in candidates:
             if os.path.exists(candidate) and os.path.exists(os.path.join(candidate, "adapter_config.json")):
@@ -100,16 +101,18 @@ def main():
                 print(f"[+] Successfully found valid adapter at: {adapter_path}")
                 break
                 
-    print(f"[*] Attaching Fine-Tuned v3 LoRA Adapter from: {adapter_path}...")
+    print(f"[*] Attaching Fine-Tuned LoRA Adapter from: {adapter_path}...")
     model = PeftModel.from_pretrained(base_model, adapter_path)
     model.eval()
     
     # 3. Load Test Data
     if not os.path.exists(args.test_file):
-        # Fallback to test.json if test_v3.json not directly in local path
-        fallback = args.test_file.replace("_v3", "")
-        if os.path.exists(fallback):
-            args.test_file = fallback
+        for fallback_name in ["test_v4.json", "test_v3.json", "test.json"]:
+            cand = os.path.join(os.path.dirname(args.test_file), fallback_name)
+            if os.path.exists(cand):
+                args.test_file = cand
+                print(f"[*] Using test file fallback: {args.test_file}")
+                break
             
     with open(args.test_file, "r", encoding="utf-8") as f:
         test_data = json.load(f)
